@@ -1,8 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+import '../repositories/weather_api_client.dart';
+import '../repositories/weather_repository.dart';
 import 'search_page.dart';
 import 'setting_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    getWeather();
+    super.initState();
+  }
+
+  getWeather() async {
+    try {
+      final weatherRespository = WeatherRepository(
+        weatherApiClient: WeatherApiClient(httpClient: http.Client()),
+      );
+
+      final weather = await weatherRespository.getWeather('seoul');
+      print('weather in seoul : ${weather.toJson()}');
+    } catch (err) {
+      print(err);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
