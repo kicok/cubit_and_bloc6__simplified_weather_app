@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_weather_cubit6/models/weather.dart';
+
+import '../models/weather.dart';
 import 'weather_api_client.dart';
 
 class WeatherRepository {
