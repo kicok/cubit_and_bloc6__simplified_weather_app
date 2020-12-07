@@ -1,11 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_weather_cubit6/cubits/weather_cubit.dart';
-import 'package:flutter_weather_cubit6/models/weather.dart';
-import 'package:http/http.dart' as http;
 
-import '../repositories/weather_api_client.dart';
-import '../repositories/weather_repository.dart';
 import 'search_page.dart';
 import 'setting_page.dart';
 
@@ -15,8 +13,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Completer<void> _refreshCompleter;
+  String city;
+
   @override
   void initState() {
+    _refreshCompleter = Completer<void>();
     super.initState();
   }
 
@@ -44,7 +46,7 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.search),
             onPressed: () async {
               // search 의 검색 결과를 가져온다.
-              final city = await Navigator.push(
+              city = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) {
@@ -61,7 +63,14 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: BlocConsumer<WeatherCubit, WeatherState>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          // refesh할때 로딩상태로 계속 머무르며 에러가 있을때 아래 코드의 주석을 푼다.
+          // 그런데 내가 할때는 아래의 코드가 있으나 없으나 refresh할때 에러가 없었음.
+          // if (state.weather != null) {
+          //   _refreshCompleter?.complete();
+          //   _refreshCompleter = Completer();
+          // }
+        },
         builder: (context, state) {
           if (state == WeatherCubit.initialWeatherState) {
             return Center(
@@ -80,7 +89,12 @@ class _HomePageState extends State<HomePage> {
 
           if (state.weather != null) {
             return RefreshIndicator(
-              onRefresh: () {},
+              onRefresh: () {
+                if (city != null) {
+                  BlocProvider.of<WeatherCubit>(context).fetchWeather(city);
+                }
+                return _refreshCompleter.future;
+              },
               child: ListView(
                 children: [
                   SizedBox(height: MediaQuery.of(context).size.height / 6),
