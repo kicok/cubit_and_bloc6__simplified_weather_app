@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_weather_cubit6/cubits/weather_cubit.dart';
 
+import '../cubits/settings_cubit.dart';
+import '../cubits/weather_cubit.dart';
 import 'search_page.dart';
 import 'setting_page.dart';
 
@@ -20,6 +21,13 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     _refreshCompleter = Completer<void>();
     super.initState();
+  }
+
+  String calculateTemp(TemperatureUnit tempUnit, double temprature) {
+    if (tempUnit == TemperatureUnit.fahrenheit) {
+      return ((temprature * 9 / 3) + 32).toStringAsFixed(2) + '℉';
+    }
+    return temprature.toStringAsFixed(2) + '℃';
   }
 
   @override
@@ -95,58 +103,67 @@ class _HomePageState extends State<HomePage> {
                 }
                 return _refreshCompleter.future;
               },
-              child: ListView(
-                children: [
-                  SizedBox(height: MediaQuery.of(context).size.height / 6),
-                  Text(
-                    state.weather.city,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    '${TimeOfDay.fromDateTime(state.weather.lastUpdated).format(context)}',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 18.0),
-                  ),
-                  SizedBox(height: 60.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+              child: BlocBuilder<SettingCubit, SettingState>(
+                builder: (context, settingState) {
+                  return ListView(
                     children: [
+                      SizedBox(height: MediaQuery.of(context).size.height / 6),
                       Text(
-                        '${state.weather.theTemp.toStringAsFixed(2)}℃',
+                        state.weather.city,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 30,
+                          fontSize: 40,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(width: 20.0),
-                      Column(
+                      SizedBox(height: 10),
+                      Text(
+                        '${TimeOfDay.fromDateTime(state.weather.lastUpdated).format(context)}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 18.0),
+                      ),
+                      SizedBox(height: 60.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Max: ${state.weather.maxTemp.toStringAsFixed(2)}℃',
-                            style: TextStyle(fontSize: 16.0),
+                            calculateTemp(settingState.temperatureUnit,
+                                state.weather.theTemp),
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                          Text(
-                            'Min: ${state.weather.minTemp.toStringAsFixed(2)}℃',
-                            style: TextStyle(fontSize: 16.0),
-                          ),
+                          SizedBox(width: 20.0),
+                          Column(
+                            children: [
+                              Text(
+                                'Max:' +
+                                    calculateTemp(settingState.temperatureUnit,
+                                        state.weather.maxTemp),
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                              Text(
+                                'Min: ' +
+                                    calculateTemp(settingState.temperatureUnit,
+                                        state.weather.minTemp),
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ],
+                          )
                         ],
+                      ),
+                      SizedBox(height: 20.0),
+                      Text(
+                        '${state.weather.weatherStateName}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 32,
+                        ),
                       )
                     ],
-                  ),
-                  SizedBox(height: 20.0),
-                  Text(
-                    '${state.weather.weatherStateName}',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 32,
-                    ),
-                  )
-                ],
+                  );
+                },
               ),
             );
           }
