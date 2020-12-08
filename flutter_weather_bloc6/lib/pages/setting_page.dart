@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../blocs/settings_bloc.dart';
 
 class SettingsPage extends StatelessWidget {
   @override
@@ -7,8 +10,22 @@ class SettingsPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Settings'),
       ),
-      body: Center(
-        child: Text('Settings'),
+      body: BlocBuilder<SettingBloc, SettingState>(
+        builder: (context, state) {
+          return Padding(
+            padding: EdgeInsets.only(left: 10, top: 20, right: 10),
+            child: ListTile(
+              title: Text('Temperature Unit'),
+              subtitle: Text('Celcius or Farenheit\nDefault: Celcius'),
+              trailing: Switch(
+                value: state.temperatureUnit == TemperatureUnit.celcius,
+                onChanged: (_) {
+                  BlocProvider.of<SettingBloc>(context).add(SettingToggleed());
+                },
+              ),
+            ),
+          );
+        },
       ),
     );
   }

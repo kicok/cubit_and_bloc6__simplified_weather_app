@@ -20,7 +20,6 @@ class SettingState extends Equatable {
       : assert(temperatureUnit != null);
 
   @override
-  // TODO: implement props
   List<Object> get props => [temperatureUnit];
 }
 

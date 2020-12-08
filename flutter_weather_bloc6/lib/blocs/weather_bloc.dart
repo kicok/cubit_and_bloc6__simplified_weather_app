@@ -1,9 +1,9 @@
-import 'package:equatable/equatable.dart';
-import 'package:flutter/semantics.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_weather_bloc6/models/weather.dart';
-import 'package:flutter_weather_bloc6/repositories/weather_repository.dart';
 import 'package:meta/meta.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../models/weather.dart';
+import '../repositories/weather_repository.dart';
 
 //events
 abstract class WeatherEvent extends Equatable {}
